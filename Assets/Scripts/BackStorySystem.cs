@@ -1,15 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BackStorySystem : MonoBehaviour
 {
     public static BackStorySystem Instance;
     public event EventHandler OnBackStoryEnded;
-    public CutSceneSequence cut;
 
     [SerializeField] private GameObject backstoryScreen;
+    [SerializeField] private Image StoryImageDisplayer;
+    [SerializeField] private TextMeshProUGUI StoryTextDisplayer;
+    [SerializeField] private Sprite[] StoryImages;
+    [SerializeField] private string[] StoryTexts;
 
     private bool isBackStoryEnded = false;
     private bool hasBackStoryStarted = false;
@@ -22,7 +27,6 @@ public class BackStorySystem : MonoBehaviour
 
     private void Start()
     {
-        cut.gameObject.SetActive(false);
         GameManager.Instance.OnGameStateChanged += GameManager_OnGameStateChanged;
         BackStoryScreenCG = backstoryScreen.GetComponent<CanvasGroup>();
         BackStoryScreenCG.alpha = 0f;
@@ -45,12 +49,9 @@ public class BackStorySystem : MonoBehaviour
         Debug.Log("Back Story Started");
         backstoryScreen.SetActive(true);
         BackStoryScreenCG.LeanAlpha(1f, 0.5f);
-        // cut.gameObject.SetActive(true);
-        // yield return StartCoroutine(cut.startCutScene());
-        // cut.gameObject.SetActive(false);
+        StartCoroutine(PlayStoryComponents());
         
-        yield return new WaitForSeconds(10f);
-
+        yield return new WaitForSeconds(25f);
 
         Debug.Log("Back Story Ended");
         BackStoryScreenCG.LeanAlpha(0f, 0.8f).setOnComplete(BackStoryEnded);
@@ -60,5 +61,15 @@ public class BackStorySystem : MonoBehaviour
     public void BackStoryEnded()
     {
         backstoryScreen.SetActive(false);
+    }
+
+    private IEnumerator PlayStoryComponents()
+    {
+        for(int i = 0; i < StoryImages.Length; i++)
+        {
+            StoryImageDisplayer.sprite = StoryImages[i];
+            StoryTextDisplayer.text = StoryTexts[i];
+            yield return new WaitForSeconds(5);
+        }
     }
 }
